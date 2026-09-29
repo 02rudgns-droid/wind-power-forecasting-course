@@ -680,19 +680,19 @@ Repository 최상위의 `submission_info.json`을 수정합니다.
 
 평가에는 NMAE를 사용합니다.
 
-$$
+```math
 \mathrm{NMAE}
 =
 \frac{1}{N}
 \sum_{t=1}^{N}
-\frac{|P_t-\hat{P}_t|}{C_t}
+\frac{\left|P_t-\hat{P}_t\right|}{C_t}
 \times 100
-$$
+```
 
 - $P_t$: 실제 전북 풍력발전량
 - $\hat{P}_t$: 예측 발전량
 - $C_t$: 해당 시점의 실제 전북 설비용량
-- $N=8,760$
+- $N = 8{,}760$: 평가시간 수
 
 **NMAE가 낮을수록 좋은 모델입니다.**
 
