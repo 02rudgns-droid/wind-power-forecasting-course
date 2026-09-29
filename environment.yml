@@ -1,0 +1,14 @@
+name: wind-forecast
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - numpy=1.26
+  - pandas=2.2
+  - scikit-learn=1.5
+  - lightgbm=4.5
+  - pyarrow=17
+  - matplotlib=3.9
+  - xlrd=2.0
