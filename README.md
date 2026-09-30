@@ -10,7 +10,7 @@
 # 0. 전체 진행 순서
 
 ```text
-Anaconda / VS Code / Git 설치
+Miniconda 또는 Anaconda / VS Code / Git 설치
         ↓
 GitHub Repository Fork
         ↓
@@ -75,7 +75,7 @@ Merge하지 않음
 수업 시작 전 다음 항목을 준비합니다.
 
 - GitHub 계정
-- Anaconda
+- Miniconda 또는 Anaconda
 - VS Code
 - Git
 
@@ -87,19 +87,39 @@ https://github.com/
 
 ---
 
-## 2.2 Anaconda 설치
+## 2.2 Conda 설치
 
-아래 공식 페이지에서 Windows용 Anaconda를 설치합니다.
+수업에서는 **Miniconda 사용을 권장**합니다.
+
+Miniconda는 conda와 최소한의 패키지만 포함하므로 Anaconda보다 설치 용량이 작습니다. 이 프로젝트는 필요한 패키지를 `environment.yml`로 별도 설치하므로 **Miniconda와 Anaconda 모두 동일하게 사용할 수 있습니다.**
+
+### 방법 A — Miniconda 설치 (권장)
+
+아래 Anaconda 공식 다운로드 페이지에서 **Miniconda**를 선택하여 Windows용 설치파일을 내려받습니다.
 
 https://www.anaconda.com/download
 
-설치가 끝나면 Windows 시작 메뉴에서 **Anaconda Prompt**를 실행하고 다음 명령으로 설치를 확인합니다.
+설치 후 Windows 시작 메뉴에서 **Miniconda Prompt**를 실행하고 다음 명령으로 설치를 확인합니다.
 
 ```powershell
 conda --version
 ```
 
 버전이 출력되면 정상입니다.
+
+### 방법 B — Anaconda 설치
+
+이미 Anaconda를 사용하고 있거나 Anaconda를 설치하려는 경우 아래 공식 페이지에서 Windows용 Anaconda를 설치합니다.
+
+https://www.anaconda.com/download
+
+설치 후 Windows 시작 메뉴에서 **Anaconda Prompt**를 실행하고 다음 명령으로 확인합니다.
+
+```powershell
+conda --version
+```
+
+> 이후 사용하는 `conda` 명령은 Miniconda와 Anaconda에서 동일합니다.
 
 ---
 
@@ -188,9 +208,9 @@ Code → HTTPS → 주소 복사
 
 을 선택합니다.
 
-처음 설치 및 환경설정은 **Anaconda Prompt** 사용을 권장합니다.
+처음 설치 및 환경설정은 **Miniconda Prompt 또는 Anaconda Prompt** 사용을 권장합니다.
 
-Anaconda Prompt에서 다음 위치로 이동합니다.
+Prompt에서 다음 위치로 이동합니다.
 
 ```powershell
 cd C:\
@@ -224,7 +244,7 @@ git remote -v
 
 Repository를 처음 Clone한 뒤 **최초 1회만** 실행합니다.
 
-Anaconda Prompt에서:
+Miniconda Prompt 또는 Anaconda Prompt에서:
 
 ```powershell
 cd C:\wind-power-forecasting-course
@@ -258,7 +278,7 @@ wind-forecast
 
 # 6. VS Code PowerShell에서 Conda 사용 설정
 
-최초 1회 Anaconda Prompt에서 다음 명령을 실행합니다.
+최초 1회 **Miniconda Prompt 또는 Anaconda Prompt**에서 다음 명령을 실행합니다.
 
 ```powershell
 conda init powershell
@@ -301,7 +321,7 @@ python --version
 
 Python 3.11.x가 출력되면 정상입니다.
 
-> 일반 PowerShell에서 `conda`를 찾을 수 없는 경우 Anaconda Prompt를 열어 `conda init powershell`을 다시 실행한 뒤 PowerShell을 재시작합니다.
+> 일반 PowerShell에서 `conda`를 찾을 수 없는 경우 Miniconda Prompt 또는 Anaconda Prompt를 열어 `conda init powershell`을 다시 실행한 뒤 PowerShell을 재시작합니다.
 
 ---
 
