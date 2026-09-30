@@ -47,6 +47,35 @@ Leaderboard 확인
 Merge하지 않음
 ```
 
+## 명령어는 어디에서 실행하나요?
+
+처음 설치할 때는 여러 종류의 터미널이 보여 헷갈릴 수 있습니다. 이 수업에서는 아래 기준만 기억하면 됩니다.
+
+```text
+[처음 1회 설정]
+Miniconda Prompt 또는 Anaconda Prompt
+        ↓
+Clone
+Conda 환경 생성
+conda init powershell
+code .
+        ↓
+VS Code 실행
+        ↓
+[이후 수업 작업]
+VS Code → Terminal → New Terminal
+(PowerShell)
+        ↓
+conda activate wind-forecast
+환경 검증 / 데이터 검증 / Baseline 실행
+Git Commit / Push 등 대부분의 명령 실행
+```
+
+즉, **6장에서 `conda init powershell`과 `code .`까지는 Miniconda Prompt 또는 Anaconda Prompt에서 실행**합니다.  
+VS Code가 열린 뒤부터는 **VS Code 안의 PowerShell 터미널에서 계속 작업**합니다.
+
+> 예외: Git을 `winget`으로 설치하는 명령은 Windows PowerShell에서 실행합니다.
+
 ---
 
 # 1. 과제 목표
@@ -148,6 +177,8 @@ Git은 아래 두 방법 중 **하나만 선택**하여 설치하면 됩니다.
 
 ### 방법 A — PowerShell에서 설치
 
+> **실행 위치: Windows PowerShell**
+
 PowerShell을 실행하고 다음 명령을 입력합니다.
 
 ```powershell
@@ -216,6 +247,8 @@ https://github.com/<본인 GitHub ID>/wind-power-forecasting-course
 
 # 4. Fork Repository Clone
 
+> **실행 위치: Miniconda Prompt 또는 Anaconda Prompt**
+
 먼저 GitHub에서 다음 순서로 **본인의 `wind-power-forecasting-course` Repository**로 이동합니다.
 
 ```text
@@ -238,9 +271,7 @@ Code → HTTPS → 주소 복사
 
 을 선택합니다.
 
-처음 설치 및 환경설정은 **Miniconda Prompt 또는 Anaconda Prompt** 사용을 권장합니다.
-
-Prompt에서 다음 위치로 이동합니다.
+Miniconda Prompt 또는 Anaconda Prompt를 열고 다음 위치로 이동합니다.
 
 ```powershell
 cd C:\
@@ -272,9 +303,9 @@ git remote -v
 
 # 5. Conda 환경 생성
 
-Repository를 처음 Clone한 뒤 **최초 1회만** 실행합니다.
+> **실행 위치: Miniconda Prompt 또는 Anaconda Prompt**
 
-Miniconda Prompt 또는 Anaconda Prompt에서:
+Repository를 처음 Clone한 뒤 **최초 1회만** 실행합니다.
 
 ```powershell
 cd C:\wind-power-forecasting-course
@@ -326,7 +357,11 @@ wind-forecast
 
 # 6. VS Code PowerShell에서 Conda 사용 설정
 
-최초 1회 **Miniconda Prompt 또는 Anaconda Prompt**에서 다음 명령을 실행합니다.
+## 6.1 여기까지는 Miniconda Prompt 또는 Anaconda Prompt
+
+> **실행 위치: Miniconda Prompt 또는 Anaconda Prompt**
+
+최초 1회 다음 명령을 실행합니다.
 
 ```powershell
 conda init powershell
@@ -334,22 +369,26 @@ conda init powershell
 
 명령 실행 후 **VS Code와 PowerShell을 모두 닫았다가 다시 실행**합니다.
 
-이후 프로젝트 폴더를 VS Code에서 엽니다.
+다시 Miniconda Prompt 또는 Anaconda Prompt를 열고 프로젝트 폴더로 이동한 뒤 VS Code를 엽니다.
 
 ```powershell
 cd C:\wind-power-forecasting-course
 code .
 ```
 
-VS Code에서:
+## 6.2 여기서부터는 VS Code PowerShell 터미널
+
+VS Code가 열리면 다음 메뉴를 선택합니다.
 
 ```text
 Terminal → New Terminal
 ```
 
-을 선택하면 PowerShell 터미널을 사용할 수 있습니다.
+화면 아래에 PowerShell 터미널이 열립니다.
 
-환경을 활성화합니다.
+> **이 지점부터 README의 명령어는 별도 설명이 없는 한 VS Code의 PowerShell 터미널에서 실행합니다.**
+
+먼저 환경을 활성화합니다.
 
 ```powershell
 conda activate wind-forecast
@@ -369,7 +408,7 @@ python --version
 
 Python 3.11.x가 출력되면 정상입니다.
 
-> 일반 PowerShell에서 `conda`를 찾을 수 없는 경우 Miniconda Prompt 또는 Anaconda Prompt를 열어 `conda init powershell`을 다시 실행한 뒤 PowerShell을 재시작합니다.
+> 일반 PowerShell 또는 VS Code 터미널에서 `conda`를 찾을 수 없는 경우 Miniconda Prompt 또는 Anaconda Prompt를 열어 `conda init powershell`을 다시 실행한 뒤 VS Code와 PowerShell을 모두 재시작합니다.
 
 ---
 
@@ -381,7 +420,7 @@ VS Code에서:
 2. `Python: Select Interpreter`
 3. `wind-forecast` 환경의 Python 선택
 
-터미널에서도 다음 명령으로 확인할 수 있습니다.
+VS Code PowerShell 터미널에서도 다음 명령으로 확인할 수 있습니다.
 
 ```powershell
 python --version
@@ -448,7 +487,9 @@ wind-power-forecasting-course/
 
 # 9. 환경 검증
 
-VS Code PowerShell에서 다음 명령을 실행합니다.
+> **실행 위치: VS Code PowerShell 터미널**
+
+다음 명령을 실행합니다.
 
 ```powershell
 conda activate wind-forecast
@@ -464,6 +505,8 @@ python scripts/check_environment.py
 ---
 
 # 10. 데이터 검증
+
+> **실행 위치: VS Code PowerShell 터미널**
 
 다음 명령을 실행합니다.
 
@@ -622,6 +665,8 @@ Baseline에서는 별도의 발전량 오차보정 모델을 적용하지 않습
 
 # 14. Baseline 실행 및 2025 예측
 
+> **실행 위치: VS Code PowerShell 터미널**
+
 2025년 최종 예측 흐름은 다음과 같습니다.
 
 ```text
@@ -776,6 +821,8 @@ Public/Private Test를 별도로 나누지 않고 **2025년 전체 8,760시간**
 
 # 19. Git 제출 방법
 
+> **실행 위치: VS Code PowerShell 터미널**
+
 ## 19.1 Git 사용자 정보 설정 — 최초 1회
 
 Commit 시 사용자 정보가 설정되어 있지 않다는 오류가 발생하면 다음을 입력합니다.
@@ -884,6 +931,8 @@ Merge하지 않음
 
 # 21. 모델을 개선하여 다시 제출하는 방법
 
+> **실행 위치: VS Code PowerShell 터미널**
+
 이미 Pull Request를 만든 뒤 모델을 개선했다면 **새 Pull Request를 만들 필요가 없습니다.**
 
 새로운 `prediction.csv`를 생성하고 `submission_info.json`의 `model_name`을 변경한 뒤:
@@ -940,6 +989,8 @@ https://github.com/Im-spec/wind-power-forecasting-course/issues/2
 ---
 
 # 23. 자주 사용하는 명령어
+
+> **실행 위치: VS Code PowerShell 터미널**
 
 수업을 다시 시작할 때:
 
