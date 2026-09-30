@@ -1,0 +1,136 @@
+name: Grade submission
+
+on:
+  workflow_run:
+    workflows: ["Collect submission"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: wind-forecast-grading-publisher
+  cancel-in-progress: false
+
+jobs:
+  grade:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout trusted grader code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: public
+          persist-credentials: false
+
+      - name: Download submission artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: submission-${{ github.event.workflow_run.id }}
+          path: submission
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify trusted PR metadata
+        shell: bash
+        env:
+          EXPECTED_PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          if [ ! -f submission/submission_metadata.json ] || [ -L submission/submission_metadata.json ]; then
+            echo "::error::제출 메타데이터를 확인할 수 없습니다."
+            exit 1
+          fi
+
+          PR_NUMBER=$(jq -r '.pr_number | tostring' submission/submission_metadata.json)
+          HEAD_SHA=$(jq -r '.head_sha' submission/submission_metadata.json)
+          GITHUB_USER=$(jq -r '.github_user' submission/submission_metadata.json)
+          HEAD_REPO=$(jq -r '.head_repo' submission/submission_metadata.json)
+
+          if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "::error::PR 번호 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Commit SHA 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$GITHUB_USER" =~ ^[A-Za-z0-9-]{1,39}$ ]]; then
+            echo "::error::GitHub 사용자 이름 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$HEAD_REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "::error::Fork 저장소 이름 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if [ -z "$EXPECTED_PR" ] || [ "$PR_NUMBER" != "$EXPECTED_PR" ]; then
+            echo "::error::Artifact의 PR 번호가 workflow_run 정보와 일치하지 않습니다."
+            exit 1
+          fi
+
+          if [ "$HEAD_SHA" != "$EXPECTED_SHA" ]; then
+            echo "::error::Artifact의 Commit SHA가 workflow_run 정보와 일치하지 않습니다."
+            exit 1
+          fi
+
+          {
+            echo "PR_NUMBER=$PR_NUMBER"
+            echo "HEAD_SHA=$HEAD_SHA"
+            echo "GITHUB_USER=$GITHUB_USER"
+            echo "HEAD_REPO=$HEAD_REPO"
+          } >> "$GITHUB_ENV"
+
+      - name: Checkout private truth data
+        uses: actions/checkout@v4
+        with:
+          repository: Im-spec/wind-power-forecasting-grader-private
+          token: ${{ secrets.GRADER_REPO_TOKEN }}
+          ref: main
+          path: grader-private
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Grade submission
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python public/scripts/grade_submission.py \
+            --prediction submission/prediction.csv \
+            --info submission/submission_info.json \
+            --truth grader-private/truth/generation_jeonbuk_2025.csv \
+            --capacity grader-private/truth/capacity_jeonbuk_2025.csv \
+            --result grading_result.json \
+            --comment grading_comment.md
+
+      - name: Remove private truth data before publishing
+        if: always()
+        shell: bash
+        run: |
+          rm -rf grader-private
+
+      - name: Publish PR result and leaderboard
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          LEADERBOARD_ISSUE: "2"
+        run: |
+          set -euo pipefail
+          python public/scripts/publish_grading_result.py \
+            --result grading_result.json \
+            --comment grading_comment.md
