@@ -871,6 +871,10 @@ Leaderboard에는 다음 정보를 표시합니다.
 
 학생별 최고 성능과 제출 이력을 확인할 수 있습니다.
 
+Leaderboard는 **강의자 원본 Repository의 `Issues → Leaderboard`**에서 확인합니다.
+
+https://github.com/Im-spec/wind-power-forecasting-course/issues/2
+
 자동검증, 자동채점 및 Leaderboard는 GitHub Actions로 운영됩니다.
 
 ---
