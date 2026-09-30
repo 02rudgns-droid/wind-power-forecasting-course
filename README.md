@@ -357,7 +357,9 @@ wind-power-forecasting-course/
 │
 ├─ scripts/
 │  ├─ check_environment.py
-│  └─ check_data.py
+│  ├─ check_data.py
+│  ├─ grade_submission.py
+│  └─ publish_grading_result.py
 │
 ├─ submission/
 │  ├─ README.md
@@ -365,6 +367,8 @@ wind-power-forecasting-course/
 │
 └─ .github/
    └─ workflows/
+      ├─ collect-submission.yml
+      └─ grade-submission.yml
 ```
 
 > Repository 최상위의 `prediction.csv`는 처음부터 제공되지 않습니다. Baseline 또는 학생이 작성한 모델을 실행하여 직접 생성합니다.
@@ -812,13 +816,13 @@ git push
 
 하면 기존 Pull Request가 자동으로 갱신됩니다.
 
-자동채점이 구성된 이후에는 Push할 때마다 다시 검증 및 채점하도록 운영할 예정입니다.
+Push할 때마다 자동으로 다시 검증 및 채점됩니다.
 
 ---
 
 # 22. 자동 검증 / 채점 / Leaderboard
 
-자동채점 시스템은 학생의 프로그램을 실행하지 않고 제출된 다음 두 파일만 읽도록 구성합니다.
+자동채점 시스템은 학생의 프로그램을 실행하지 않고 제출된 다음 두 파일만 읽습니다.
 
 ```text
 prediction.csv
@@ -839,15 +843,15 @@ submission_info.json
 
 검증을 통과하면 2025년 비공개 실제자료를 이용하여 NMAE를 계산하고 결과를 Pull Request에 표시합니다.
 
-Leaderboard는 기본적으로 다음 정보를 표시할 예정입니다.
+Leaderboard에는 다음 정보를 표시합니다.
 
 ```text
 순위 | 이름 | 모델명 | NMAE
 ```
 
-학생별 최고 성능과 제출 이력을 확인할 수 있도록 운영할 예정입니다.
+학생별 최고 성능과 제출 이력을 확인할 수 있습니다.
 
-> 자동검증, 자동채점 및 Leaderboard는 GitHub Actions 구성 후 활성화됩니다.
+자동검증, 자동채점 및 Leaderboard는 GitHub Actions로 운영됩니다.
 
 ---
 
