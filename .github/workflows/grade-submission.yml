@@ -40,6 +40,40 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
 
+      - name: Validate downloaded artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for file in prediction.csv submission_info.json submission_metadata.json; do
+            path="submission/$file"
+
+            if [ ! -e "$path" ]; then
+              echo "::error::$file 파일이 Artifact에 없습니다."
+              exit 1
+            fi
+
+            if [ -L "$path" ] || [ ! -f "$path" ]; then
+              echo "::error::$file 은 일반 파일이어야 하며 심볼릭 링크일 수 없습니다."
+              exit 1
+            fi
+          done
+
+          if [ "$(stat -c%s submission/prediction.csv)" -gt 2000000 ]; then
+            echo "::error::prediction.csv 파일 크기가 너무 큽니다."
+            exit 1
+          fi
+
+          if [ "$(stat -c%s submission/submission_info.json)" -gt 20000 ]; then
+            echo "::error::submission_info.json 파일 크기가 너무 큽니다."
+            exit 1
+          fi
+
+          if [ "$(stat -c%s submission/submission_metadata.json)" -gt 20000 ]; then
+            echo "::error::submission_metadata.json 파일 크기가 너무 큽니다."
+            exit 1
+          fi
+
       - name: Verify trusted PR metadata
         shell: bash
         env:
@@ -47,11 +81,6 @@ jobs:
           EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
-
-          if [ ! -f submission/submission_metadata.json ] || [ -L submission/submission_metadata.json ]; then
-            echo "::error::제출 메타데이터를 확인할 수 없습니다."
-            exit 1
-          fi
 
           PR_NUMBER=$(jq -r '.pr_number | tostring' submission/submission_metadata.json)
           HEAD_SHA=$(jq -r '.head_sha' submission/submission_metadata.json)
