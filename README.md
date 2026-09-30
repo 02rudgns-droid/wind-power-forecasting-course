@@ -188,19 +188,49 @@ https://github.com/Im-spec/wind-power-forecasting-course
 4. Repository name은 `wind-power-forecasting-course`를 그대로 사용합니다.
 5. **Create fork**를 클릭합니다.
 
-Fork가 완료되면 다음과 같이 본인 계정 아래에 Repository가 생성됩니다.
+Fork가 완료되면 강의자 Repository가 **본인의 GitHub 계정 아래에 복사**됩니다.
+
+예를 들어 본인의 GitHub ID가 `student123`이라면 다음 주소가 본인의 Fork Repository입니다.
+
+```text
+https://github.com/student123/wind-power-forecasting-course
+```
+
+본인의 Fork Repository를 다시 찾으려면 GitHub에서 다음 순서로 이동합니다.
+
+```text
+오른쪽 위 프로필 사진
+→ Your repositories
+→ wind-power-forecasting-course
+```
+
+주소가 다음 형태이면 본인의 Fork Repository가 맞습니다.
 
 ```text
 https://github.com/<본인 GitHub ID>/wind-power-forecasting-course
 ```
 
-학생은 이후 **본인의 Fork Repository에서 작업**합니다.
+학생은 이후 **이 Repository에서 작업**합니다.
 
 ---
 
 # 4. Fork Repository Clone
 
-본인의 Fork Repository에서:
+먼저 GitHub에서 다음 순서로 **본인의 `wind-power-forecasting-course` Repository**로 이동합니다.
+
+```text
+오른쪽 위 프로필 사진
+→ Your repositories
+→ wind-power-forecasting-course
+```
+
+Repository 주소가 다음 형태인지 확인합니다.
+
+```text
+https://github.com/<본인 GitHub ID>/wind-power-forecasting-course
+```
+
+해당 Repository에서:
 
 ```text
 Code → HTTPS → 주소 복사
@@ -216,7 +246,7 @@ Prompt에서 다음 위치로 이동합니다.
 cd C:\
 ```
 
-본인의 Fork 주소를 사용하여 Clone합니다.
+방금 복사한 본인의 Fork 주소를 사용하여 Clone합니다.
 
 ```powershell
 git clone https://github.com/<본인 GitHub ID>/wind-power-forecasting-course.git wind-power-forecasting-course
@@ -794,7 +824,19 @@ git push
 
 # 20. Pull Request 생성
 
-Push가 완료되면 GitHub의 **본인 Fork Repository**로 이동합니다.
+Push가 완료되면 GitHub에서 다음 순서로 **본인의 `wind-power-forecasting-course` Repository**로 이동합니다.
+
+```text
+오른쪽 위 프로필 사진
+→ Your repositories
+→ wind-power-forecasting-course
+```
+
+주소가 다음 형태인지 확인합니다.
+
+```text
+https://github.com/<본인 GitHub ID>/wind-power-forecasting-course
+```
 
 일반적으로 다음과 같은 버튼이 표시됩니다.
 
@@ -947,6 +989,6 @@ git push
 3. 최종 `prediction.csv`는 **8,760행**이어야 합니다.
 4. `submission_info.json`에 본인 이름과 모델명을 입력합니다.
 5. 제출 시 `prediction.csv`와 `submission_info.json`을 Commit / Push합니다.
-6. 본인의 Fork에서 강의자 Repository로 Pull Request를 생성합니다.
+6. 본인 GitHub 계정의 `wind-power-forecasting-course` Repository에서 강의자 Repository로 Pull Request를 생성합니다.
 7. 모델을 개선하면 같은 Pull Request에 계속 Push할 수 있습니다.
 8. 학생 Pull Request는 **Merge하지 않습니다.**
