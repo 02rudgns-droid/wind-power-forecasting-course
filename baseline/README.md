@@ -86,9 +86,9 @@ Ridge Regression
 
 `풍속_ms`는 별도 Ridge로 예측하지 않고 추정된 `u_ms`, `v_ms`에서 계산한다.
 
-$$
+```math
 WS = \sqrt{u^2 + v^2}
-$$
+```
 
 ## Stage 3. 별도 보정 없음
 
@@ -111,8 +111,10 @@ Baseline에서는 LDAPS → ASOS 과정의 오차가 최종 발전량 예측으�
 
 ## 실행
 
-```bash
-pip install -r requirements.txt
+먼저 공식 Conda 환경을 활성화한다.
+
+```powershell
+conda activate wind-forecast
 python baseline/baseline.py
 ```
 
