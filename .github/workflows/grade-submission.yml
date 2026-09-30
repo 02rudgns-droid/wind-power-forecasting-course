@@ -19,7 +19,7 @@ jobs:
   grade:
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request'
+      github.event.workflow_run.event == 'pull_request_target'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -78,13 +78,13 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha }}
-          EXPECTED_HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
         run: |
           set -euo pipefail
 
           PR_NUMBER=$(jq -r '.pr_number | tostring' submission/submission_metadata.json)
           ARTIFACT_SHA=$(jq -r '.head_sha' submission/submission_metadata.json)
+          ARTIFACT_HEAD_REPO=$(jq -r '.head_repo' submission/submission_metadata.json)
+          ARTIFACT_GITHUB_USER=$(jq -r '.github_user' submission/submission_metadata.json)
 
           if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
             echo "::error::PR 번호 형식이 올바르지 않습니다."
@@ -96,8 +96,13 @@ jobs:
             exit 1
           fi
 
-          if [ "$ARTIFACT_SHA" != "$EXPECTED_SHA" ]; then
-            echo "::error::Artifact의 Commit SHA가 workflow_run 정보와 일치하지 않습니다."
+          if ! [[ "$ARTIFACT_HEAD_REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "::error::Artifact의 Fork 저장소 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$ARTIFACT_GITHUB_USER" =~ ^[A-Za-z0-9-]{1,39}$ ]]; then
+            echo "::error::Artifact의 GitHub 사용자 이름 형식이 올바르지 않습니다."
             exit 1
           fi
 
@@ -119,23 +124,23 @@ jobs:
             exit 1
           fi
 
-          if [ "$API_HEAD_SHA" != "$EXPECTED_SHA" ]; then
-            echo "::error::현재 PR의 Commit SHA가 workflow_run 정보와 일치하지 않습니다."
+          if [ "$API_HEAD_SHA" != "$ARTIFACT_SHA" ]; then
+            echo "::error::현재 PR의 Commit SHA가 Artifact와 일치하지 않습니다."
             exit 1
           fi
 
-          if [ "$API_HEAD_REPO" != "$EXPECTED_HEAD_REPO" ]; then
-            echo "::error::현재 PR의 Fork 저장소가 workflow_run 정보와 일치하지 않습니다."
+          if [ "$API_HEAD_REPO" != "$ARTIFACT_HEAD_REPO" ]; then
+            echo "::error::현재 PR의 Fork 저장소가 Artifact와 일치하지 않습니다."
+            exit 1
+          fi
+
+          if [ "$API_GITHUB_USER" != "$ARTIFACT_GITHUB_USER" ]; then
+            echo "::error::현재 PR 작성자가 Artifact와 일치하지 않습니다."
             exit 1
           fi
 
           if [ "$API_BASE_REPO" != "$GITHUB_REPOSITORY" ] || [ "$API_BASE_REF" != "main" ]; then
             echo "::error::채점 대상 PR의 base 저장소 또는 브랜치가 올바르지 않습니다."
-            exit 1
-          fi
-
-          if ! [[ "$API_GITHUB_USER" =~ ^[A-Za-z0-9-]{1,39}$ ]]; then
-            echo "::error::GitHub 사용자 이름 형식이 올바르지 않습니다."
             exit 1
           fi
 
