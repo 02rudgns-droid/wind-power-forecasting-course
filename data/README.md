@@ -50,15 +50,3 @@ data/static/
 ```text
 2024-01-01 00:00 → 00:00~01:00 구간
 ```
-
-## 5. 교수자용 원본 Parquet 준비
-
-원본 Parquet에는 학생에게 공개하면 안 되는 2025년 ASOS 자료가 포함되어 있습니다.
-
-원본 파일은 `data/raw/`에 로컬로만 두고 다음 명령으로 학생용 데이터를 생성합니다.
-
-```bash
-python scripts/prepare_parquet.py
-```
-
-`data/raw/`는 `.gitignore`에 등록되어 있어 원본 파일이 GitHub에 올라가지 않도록 구성되어 있습니다.
