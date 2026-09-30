@@ -251,6 +251,24 @@ cd C:\wind-power-forecasting-course
 conda env create -f environment.yml
 ```
 
+### `CondaToSNonInteractiveError`가 발생하는 경우
+
+일부 환경에서는 Anaconda 공식 패키지 채널의 이용약관 동의가 완료되지 않아 환경 생성이 중단될 수 있습니다.
+
+아래 명령을 **최초 1회** 실행합니다.
+
+```powershell
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/msys2
+```
+
+동의가 완료되면 다시 환경을 생성합니다.
+
+```powershell
+conda env create -f environment.yml
+```
+
 환경이 생성되었는지 확인합니다.
 
 ```powershell
