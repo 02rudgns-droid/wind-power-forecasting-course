@@ -1,0 +1,87 @@
+name: Collect submission
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - prediction.csv
+      - submission_info.json
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Validate submission files for artifact transfer
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for file in prediction.csv submission_info.json; do
+            if [ ! -e "$file" ]; then
+              echo "::error::$file 파일이 없습니다."
+              exit 1
+            fi
+
+            if [ -L "$file" ]; then
+              echo "::error::$file 은 심볼릭 링크일 수 없습니다."
+              exit 1
+            fi
+
+            if [ ! -f "$file" ]; then
+              echo "::error::$file 은 일반 파일이어야 합니다."
+              exit 1
+            fi
+          done
+
+          prediction_size=$(stat -c%s prediction.csv)
+          info_size=$(stat -c%s submission_info.json)
+
+          if [ "$prediction_size" -gt 2000000 ]; then
+            echo "::error::prediction.csv 파일 크기가 너무 큽니다."
+            exit 1
+          fi
+
+          if [ "$info_size" -gt 20000 ]; then
+            echo "::error::submission_info.json 파일 크기가 너무 큽니다."
+            exit 1
+          fi
+
+      - name: Write trusted PR metadata
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_USER: ${{ github.event.pull_request.user.login }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          set -euo pipefail
+          jq -n \
+            --argjson pr_number "$PR_NUMBER" \
+            --arg head_sha "$HEAD_SHA" \
+            --arg github_user "$GITHUB_USER" \
+            --arg head_repo "$HEAD_REPO" \
+            '{pr_number:$pr_number, head_sha:$head_sha, github_user:$github_user, head_repo:$head_repo}' \
+            > submission_metadata.json
+
+      - name: Upload submission artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission-${{ github.run_id }}
+          path: |
+            prediction.csv
+            submission_info.json
+            submission_metadata.json
+          if-no-files-found: error
+          retention-days: 1
