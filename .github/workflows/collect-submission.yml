@@ -1,7 +1,7 @@
 name: Collect submission
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - prediction.csv
@@ -16,15 +16,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout exact PR head
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          path: submission-src
-          persist-credentials: false
-
-      - name: Validate and package submission
+      - name: Download only submission data from exact PR head
         shell: bash
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -34,22 +26,47 @@ jobs:
         run: |
           set -euo pipefail
 
+          if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "::error::PR 번호 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::PR Commit SHA 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$HEAD_REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "::error::Fork 저장소 이름 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          if ! [[ "$GITHUB_USER" =~ ^[A-Za-z0-9-]{1,39}$ ]]; then
+            echo "::error::GitHub 사용자 이름 형식이 올바르지 않습니다."
+            exit 1
+          fi
+
+          mkdir -p artifact
+
+          curl --fail --location --silent --show-error \
+            "https://raw.githubusercontent.com/$HEAD_REPO/$HEAD_SHA/prediction.csv" \
+            --output artifact/prediction.csv
+
+          curl --fail --location --silent --show-error \
+            "https://raw.githubusercontent.com/$HEAD_REPO/$HEAD_SHA/submission_info.json" \
+            --output artifact/submission_info.json
+
           for file in prediction.csv submission_info.json; do
-            path="submission-src/$file"
+            path="artifact/$file"
 
-            if [ ! -e "$path" ]; then
-              echo "::error::$file 파일이 없습니다."
-              exit 1
-            fi
-
-            if [ -L "$path" ] || [ ! -f "$path" ]; then
-              echo "::error::$file 은 일반 파일이어야 하며 심볼릭 링크일 수 없습니다."
+            if [ ! -f "$path" ] || [ -L "$path" ]; then
+              echo "::error::$file 은 일반 파일이어야 합니다."
               exit 1
             fi
           done
 
-          prediction_size=$(stat -c%s submission-src/prediction.csv)
-          info_size=$(stat -c%s submission-src/submission_info.json)
+          prediction_size=$(stat -c%s artifact/prediction.csv)
+          info_size=$(stat -c%s artifact/submission_info.json)
 
           if [ "$prediction_size" -gt 2000000 ]; then
             echo "::error::prediction.csv 파일 크기가 너무 큽니다."
@@ -60,10 +77,6 @@ jobs:
             echo "::error::submission_info.json 파일 크기가 너무 큽니다."
             exit 1
           fi
-
-          mkdir -p artifact
-          cp submission-src/prediction.csv artifact/prediction.csv
-          cp submission-src/submission_info.json artifact/submission_info.json
 
           jq -n \
             --argjson pr_number "$PR_NUMBER" \
